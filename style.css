@@ -1,0 +1,103 @@
+/* 地球の傾きと四季 — 夜空の観測所（月のページと同じトーン）
+   方針：グローバル要素ルールを土台に、色・角丸・余白はトークンに集約。
+   クラスは「繰り返す部品」だけ。 */
+
+:root {
+  --bg: #0a0c18;
+  --surface: #12162a;
+  --line: #262c4c;
+  --text: #e0e0e8;
+  --dim: #9098b0;
+  --gold: #e0c080;
+  --moon: #f0f0e0;
+  --sea: #6090c0;
+  --r: 12px;
+  --gap: 24px;
+  --serif: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: radial-gradient(ellipse at 50% -10%, #1a2040 0%, var(--bg) 55%) fixed;
+  color: var(--text);
+  font: 16px/1.85 "Segoe UI", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  padding: 0 16px 80px;
+}
+
+main, header, footer { max-width: 880px; margin: 0 auto; }
+main { display: grid; gap: var(--gap); }
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: .06em; line-height: 1.4; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.35rem; color: var(--moon); }
+h3 { font-size: 1.05rem; color: var(--gold); margin-top: 1.4em; }
+p { margin-top: .9em; }
+p, li, dd { color: var(--text); }
+small, figcaption { color: var(--dim); font-size: .85rem; line-height: 1.6; }
+strong { color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; }
+a { color: var(--gold); }
+
+header { padding: 40px 0 24px; }
+header p { color: var(--dim); margin-top: .3em; letter-spacing: .1em; }
+
+section, article {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 28px 24px;
+}
+article > h2 span { color: var(--gold); margin-right: .5em; font-size: .9em; }
+
+figure { margin-top: 1.2em; }
+figcaption { margin-top: .6em; }
+svg { display: block; max-width: 100%; height: auto; }
+
+button, select {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font: inherit;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+select { background: var(--surface); border-radius: 8px; }
+button:hover, select:hover { border-color: var(--gold); color: var(--gold); }
+button:disabled { opacity: .35; cursor: default; }
+
+input[type=range] { width: 100%; accent-color: var(--gold); margin-top: .8em; }
+label { color: var(--dim); font-size: .85rem; display: block; margin-top: 1em; }
+
+dl { display: grid; grid-template-columns: auto 1fr; gap: .5em 1.4em; margin-top: 1.2em; }
+dt { color: var(--dim); font-size: .9rem; }
+dd { font-variant-numeric: tabular-nums; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 1em; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: .4em .5em; border-bottom: 1px solid var(--line); font-weight: 400; vertical-align: top; }
+th { color: var(--dim); font-size: .85rem; }
+
+article > ul, article > ol { margin-top: .8em; padding-left: 1.5em; }
+li + li { margin-top: .3em; }
+
+footer { margin-top: 40px; }
+
+/* --- 回せる地球 --- */
+#spin { display: grid; grid-template-columns: minmax(0, 360px) 1fr; gap: 32px; align-items: center; }
+#spin canvas, #spin-fb { width: 100%; aspect-ratio: 1; border-radius: 50%; box-shadow: 0 0 60px rgba(96, 144, 192, .35); }
+#spin canvas { height: auto; cursor: grab; touch-action: pan-y; }
+#spin canvas:active { cursor: grabbing; }
+#spin-fb { background: url(img/earth-oct.jpg) 0 0 / 200% 100% repeat-x; animation: spin-fb 40s linear infinite; }
+@keyframes spin-fb { to { background-position: -200% 0; } }
+
+/* --- 部品 --- */
+.viz { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 20px; align-items: center; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 1em; align-items: center; }
+
+@media (max-width: 640px) {
+  section, article { padding: 20px 16px; }
+  .viz, #spin { grid-template-columns: 1fr; }
+  #spin canvas { max-width: 320px; margin: 0 auto; }
+}
