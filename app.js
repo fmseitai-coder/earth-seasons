@@ -128,13 +128,23 @@
       var h = (o.H0 + lo) * R, c = Math.cos(la * R), k = Math.sin(la * R), ch = Math.cos(h), sh = Math.sin(h);
       return [c * (ch * e1[0] + sh * e2[0]) + k * aw[0], c * (ch * e1[1] + sh * e2[1]) + k * aw[1], c * (ch * e1[2] + sh * e2[2]) + k * aw[2]];
     }
-    // 視点：follow なら、選んだ都市がいつも真ん中に来るよう、縦軸まわりに回す
-    var yaw = 0;
-    if (o.follow && o.mark) { var pc0 = Pw(o.mark.lat, o.mark.lon); yaw = Math.atan2(-pc0[0], pc0[2]); }
-    var cy0 = Math.cos(yaw), sy0 = Math.sin(yaw);
-    function rot(v) { return [v[0] * cy0 + v[2] * sy0, v[1], -v[0] * sy0 + v[2] * cy0]; }
-    // 左右を反転して、太陽が画面の右に来るようにする（反対側から見た図）
-    function flip(v) { return [-v[0], v[1], v[2]]; }
+    // 視点
+    //  follow：地球と一緒に地軸のまわりを回るカメラ。選んだ都市の子午線がいつも手前を向き、
+    //          地軸の傾きも都市も止まって見える。動くのは、太陽と昼夜の境目のほう
+    //  それ以外：太陽の真横から見る。左右を反転して、太陽が画面の右に来るようにする（反対側から見た図）
+    var rot, flip;
+    if (o.follow && o.mark) {
+      var Hc = (o.H0 + o.mark.lon) * R, ch0 = Math.cos(Hc), sh0 = Math.sin(Hc);
+      var Zc = [ch0 * e1[0] + sh0 * e2[0], ch0 * e1[1] + sh0 * e2[1], ch0 * e1[2] + sh0 * e2[2]];
+      var Wc = cross(aw, Zc), st0 = Math.sin(o.eps * R), ct0 = Math.cos(o.eps * R);
+      var Xc = [st0 * aw[0] + ct0 * Wc[0], st0 * aw[1] + ct0 * Wc[1], st0 * aw[2] + ct0 * Wc[2]];
+      var Yc = [ct0 * aw[0] - st0 * Wc[0], ct0 * aw[1] - st0 * Wc[1], ct0 * aw[2] - st0 * Wc[2]];
+      rot = function (v) { return [dot(v, Xc), dot(v, Yc), dot(v, Zc)]; };
+      flip = function (v) { return v; };
+    } else {
+      rot = function (v) { return v; };
+      flip = function (v) { return [-v[0], v[1], v[2]]; };
+    }
     function P(la, lo) { return flip(rot(Pw(la, lo))); }
     var s2 = flip(rot([-1, 0, 0]));      // 画面から見た太陽の方向
     a = flip(rot(a));
